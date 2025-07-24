@@ -91,7 +91,7 @@ VIDE/
 ## FAQ
 
 **Q: Can I use this to overwrite my real Vim setup?**\
-A: Yes, but that's your funeral. By default, VIDE is safe and sandboxed.
+A: Yes, but by default, VIDE is safe and sandboxed.
 
 **Q: How do I update plugins/extensions?**\
 A: Edit configs, then rerun the script with a clean sandbox.
@@ -99,7 +99,7 @@ A: Edit configs, then rerun the script with a clean sandbox.
 **Q: Does this handle plugin version pinning?**\
 A: Not yet—pin in `.vimrc` if you care. See script and comments for details.
 
-**Q: Where are my settings?**\
+**Q: Where are the settings?**\
 A: All configs are in the `configs/` directory.
 
 ---
