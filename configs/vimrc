@@ -1,0 +1,1487 @@
+"""""""""""""""" Key Combo Notes
+
+" # The ALT keys:
+" Alt: document task, downward
+" Shift: document UN-task, downward
+" Ctrl: document task in upward
+
+" " put unique window identifier into w:id variable
+autocmd VimEnter,WinEnter * if !exists('w:win_tag') | let w:win_tag="" | endif
+
+
+""""""""""""""""" Defaults
+
+"let g:prev_log_search=''
+let g:log_search_any=':\(\d\d*:\)*\d\d*:.*\([A-Za-z]\)'
+let g:log_search_warn=':\(\d\d*:\)*\d\d*:.*\([Ww]arn\)'
+let g:log_search_error=':\(\d\d*:\)*\d\d*:.*\([Ee]rror\|[Rr]equired\)'
+let g:prev_log_search_highlightGroup='Error'
+let g:win_output_name='output.garbage.garbage'
+let g:win_explorer_name='.explorer.garbage'
+let g:win_todo_name='./todo.md'
+let g:todo_file='./todo.md'
+
+let g:min_output_height=6
+if !exists( "g:prev_output_height" ) || g:prev_output_height <= 0
+    let g:prev_output_height=g:min_output_height
+endif
+
+let g:min_todo_width=28
+if !exists( "g:prev_todo_width" ) || g:prev_todo_width <= 0
+    let g:prev_todo_width=g:min_todo_width
+endif
+
+let g:min_explorer_width=28
+if !exists( "g:prev_explorer_width" ) || g:prev_explorer_width <= 0
+    let g:prev_explorer_width=g:min_explorer_width
+endif
+
+""""""""""""""""" Vim Shortcuts
+
+nnoremap <C-d> :confirm q<CR>
+nnoremap <C-S-d> :confirm qa<CR>
+
+" todo: vmap vs xmap
+"
+" double-tap v to do line-mode
+vnoremap v <S-v>
+
+" Vim Built-In: insert at beginning of line
+" <S-i>
+
+" insert at end of line
+nnoremap <leader><right> $<Insert><Right>
+
+" insert at start of line
+nnoremap <leader><left> 0i
+
+" insert at start of first word
+"nnoremap <leader>i1 ^i
+
+" insert at new line below
+"nnoremap <leader>i<cr> $<Insert><Right><cr>
+"nnoremap <S-cr> $<Insert><Right><Return>
+nnoremap <leader><Return> $<Insert><Right><Return>
+nnoremap <leader><Down> $<Insert><Right><Return>
+
+" insert at new line above
+nnoremap <leader><Up> ^i<Return><Up>
+
+" insert new line & stay out of insert mode
+"nnoremap <C-S-N> o
+"nnoremap <C-N> jo
+
+" paste at end of line
+nnoremap <leader>]p :normal! mz$]p`z<CR>
+" paste at beginning of line
+nnoremap <leader>[p :normal! mz^[p`z<CR>
+
+" paste system clipboard at end of line
+nnoremap <leader>]+p :normal! mz$"+]p`z<CR>
+nnoremap <leader>+]p :normal! mz$"+]p`z<CR>
+"nnoremap <leader>]p $"+p
+
+" paste system clipboard at beginning of line
+nnoremap <leader>[+p :normal! mz^"+[p`z<CR>
+nnoremap <leader>+[p :normal! mz^"+[p`z<CR>
+"nnoremap <leader>]p :normal! mz$"+p`z<CR>
+"nnoremap <leader>[p 0"+p
+
+" :put + # will paste system clipboard below current line on most builds
+" :put! + # will paste system clipboard above current line on most builds
+
+
+""""""""""""""""" VIDE Binds
+
+noremap <C-S-K> :e/usr/lib/python3.10/tkinter/ttk.py<cr> 
+
+nnoremap <silent> <F3> :call TogglePane(g:win_explorer_name)<cr>
+inoremap <silent> <F3> <C-\><C-O>:call TogglePane(g:win_explorer_name)<cr>
+
+nnoremap <silent> <S-F3> :call RefreshExplorerWindow()<cr>
+inoremap <silent> <S-F3> <C-\><C-O>:call RefreshExplorerWindow()<cr>
+
+nnoremap <silent> <F4> :call TogglePane(g:win_todo_name)<cr>
+inoremap <silent> <F4> <C-\><C-O>:call TogglePane(g:win_todo_name)<cr>
+
+nnoremap <silent> <S-F4> :call RefreshToDoWindow()<cr>
+inoremap <silent> <S-F4> <C-\><C-O>:call RefreshToDoWindow()<cr>
+
+nnoremap <silent> <C-F4> :call MaximizeToDoWindow()<cr>
+inoremap <silent> <C-F4> <C-\><C-O>:call MaximizeToDoWindow()<cr>
+
+nnoremap <silent> <F2> :call TogglePane(g:win_output_name)<cr>
+inoremap <silent> <F2> <C-\><C-O>:call TogglePane(g:win_output_name)<cr>
+"vnoremap <silent> <F2> <C-\><C-O>:call TogglePane(g:win_output_name)<cr>
+"todo: https://stackoverflow.com/questions/15561132/run-command-when-vim-enters-visual-mode
+
+" go to first error/warning
+nnoremap <silent> E :call Goto_FirstLogOccurenceInFile(g:log_search_error, 'Error')<cr>
+nnoremap <silent> W :call Goto_FirstLogOccurenceInFile(g:log_search_warn, 'Todo')<cr>
+
+" go to next error/warning
+nnoremap <silent> <M-Home> :call Goto_PrevLogOccurenceInFile('bW')<cr>
+inoremap <silent> <M-Home> <C-\><C-O>:call Goto_PrevLogOccurenceInFile('bW')<cr>
+nnoremap <silent> <M-End> :call Goto_NextLogOccurenceInFile('W')<cr>
+inoremap <silent> <M-End> <C-\><C-O>:call Goto_NextLogOccurenceInFile('W')<cr>
+
+" go to first/last occurence
+nnoremap <silent> f *[[nzz
+nnoremap <silent> F *]]Nzz
+
+" :h keycodes
+" goto next/prev search selection
+nnoremap <silent> <C-S-Home> ?<cr>
+nnoremap <silent> <C-S-End> /<cr>
+
+" turn off the help menu because it's annoying.
+" we can get to help pages faster with :help [whatever]
+nnoremap <silent> <F1> :call Nothing()<cr>
+inoremap <silent> <F1> <C-\><C-O>:call Nothing()<cr>
+"vnoremap <silent> <F1> :call Nothing()<cr> " todo
+map <silent> <F1> :call Nothing()<cr>
+function Nothing()
+endfun
+
+nnoremap <C-o> :call OpenSelectedFile('l', 'above')<cr>
+
+nnoremap <silent> <leader>f<Up> :call Explore("above ter")<cr>
+nnoremap <silent> <leader>f<Down> :call Explore("below ter")<cr>
+nnoremap <silent> <leader>f<Left> :call Explore("vertical topleft ter")<cr>
+nnoremap <silent> <leader>f<Right> :call Explore("vertical botright ter")<cr>
+
+" stop build / stop run
+map <silent> <S-F5> :call StopBuild()<CR>
+
+" run .vim-run.sh
+map <silent> <C-F5> :call On_RunButtonPressed()<CR>
+imap <silent> <C-F5> <Esc>:call On_RunButtonPressed()<CR>
+vmap <silent> <C-F5> <Esc><Esc>:call On_RunButtonPressed()<CR>
+nnoremap <silent> <C-F5> :call On_RunButtonPressed()<CR>
+
+" run .vim-debug.sh
+map <silent> <F5> :call On_DebugButtonPressed()<CR>
+imap <silent> <F5> <Esc>:call On_DebugButtonPressed()<CR>
+vmap <silent> <F5> <Esc><Esc>:call On_DebugButtonPressed()<CR>
+nnoremap <silent> <F5> :call On_DebugButtonPressed()<CR>
+
+nnoremap <leader>te :tabedit %<cr>
+nnoremap <leader>tc :tabclose<cr>
+nnoremap <leader>tn :tabnew<cr>
+
+" these work, but I use them to navigate konsole windows.
+" for now, I'mma just use them for Vim, and suffer
+"map <M-Up> :call GrowWindow('', '+1')<cr>
+"map <M-Down> :call GrowWindow('', '-1')<cr>
+"map <M-Left> :call GrowWindow('vert', '+1')<cr>
+"map <M-Right> :call GrowWindow('vert', '-1')<cr>
+"imap <M-Up> <C-\><C-O>:call GrowWindow('', '+1')<cr>
+"imap <M-Down> <C-\><C-O>:call GrowWindow('', '-1')<cr>
+"imap <M-Left> <C-\><C-O>:call GrowWindow('vert', '+1')<cr>
+"imap <M-Right> <C-\><C-O>:call GrowWindow('vert', '-1')<cr>
+
+nnoremap <M-Up> <C-w>k   " window up
+nnoremap <M-Down> <C-w>j   " window down
+nnoremap <M-Left> <C-w>h   " window left
+nnoremap <M-Right> <C-w>l   " window right
+"
+"nnoremap <leader><Up> <C-w>k   " window up
+"nnoremap <leader><Down> <C-w>j   " window down
+"nnoremap <leader><Left> <C-w>h   " window left
+"nnoremap <leader><Right> <C-w>l   " window right
+
+" open file dialog
+nnoremap <leader>o. :o.<cr>
+nnoremap <leader>o<Up> <C-w>s:o.<cr>
+nnoremap <leader>o<Down> <C-w>s<C-w>j:o.<cr>
+nnoremap <leader>o<Left> <C-w>v<C-w>h:o.<cr>
+nnoremap <leader>o<Right> <C-w>v<C-w>l:o.<cr>
+nnoremap <leader>q. :o.<cr>
+nnoremap <leader>q<Up> <C-w>k:q<cr>
+nnoremap <leader>q<Down> <C-w>j:q<cr>
+nnoremap <leader>q<Left> <C-w>h:q<cr>
+nnoremap <leader>q<Right> <C-w>l:q<cr>
+
+nmap <C-S-Left> <C-w><Left>
+nmap <C-S-Right> <C-w><Right>
+nmap <C-S-Up> <C-w><Up>
+nmap <C-S-Down> <C-w><Down>
+
+" quitting / closing
+"nnoremap <C-d> :q<cr>
+
+" moving - and making windows bigger
+"nmap <C-PageUp> <C-w><Up>:resize +80<cr>
+"nmap <C-PageDown> <C-w><Down>:resize +80<cr>
+"nmap <M-PageUp> <C-w><Up>:resize +20<cr>
+"nmap <M-PageDown> <C-w><Down>:resize +20<cr>
+
+" switching windows
+"nnoremap <C-Up>    <C-w>k
+"nnoremap <C-Down>  <C-w>j
+"nnoremap <C-Left>  <C-w>h
+"nnoremap <C-Right> <C-w>l
+
+"nnoremap <C-M-Up>    <C-w>k
+"nnoremap <C-M-Down>  <C-w>j
+"nnoremap <C-M-Left>  <C-w>h
+"nnoremap <C-M-Right> <C-w>l
+
+inoremap <silent> <C-PageUp> <C-\><C-O>:call Goto_ResizedWindow( 'k', '+200' )<cr>
+inoremap <silent> <C-PageDown> <C-\><C-O>:call Goto_ResizedWindow( 'j', '+200' )<cr>
+inoremap <silent> <C-M-PageUp> <C-\><C-O>:call Goto_ResizedWindow( 'k', '+20' )<cr>
+inoremap <silent> <C-M-PageDown> <C-\><C-O>:call Sxitch_To_Window( 'j', '+20' )<cr>
+nnoremap <silent> <C-PageUp> :call Goto_ResizedWindow( 'k', '+200' )<cr>
+nnoremap <silent> <C-PageDown> :call Goto_ResizedWindow( 'j', '+200' )<cr>
+nnoremap <silent> <C-M-PageUp> :call Goto_ResizedWindow( 'k', '+20' )<cr>
+nnoremap <silent> <C-M-PageDown> :call Goto_ResizedWindow( 'j', '+20' )<cr>
+imap <C-S-Left> <C-\><C-O><C-w><Left>
+imap <C-S-Right> <C-\><C-O><C-w><Right>
+imap <C-S-Up> <C-\><C-O><C-w><Up>
+imap <C-S-Down> <C-\><C-O><C-w><Down>
+
+" resizing
+"nmap <M+-> :resize +5<cr>
+"nmap <M-S-Plus> :resize +5<cr>
+
+" split view:
+nnoremap <leader>s<Up>       <C-w>s
+nnoremap <leader>s<Down>     <C-w>s<C-w>j
+nnoremap <leader>s<Left>     <C-w>v
+nnoremap <leader>s<Right>    <C-w>v<C-w>l
+
+" new file:
+nnoremap <leader>n. :n.<cr>
+nnoremap <leader>n<Up> :above new<cr>
+nnoremap <leader>n<Down> :below new<cr>
+nnoremap <leader>n<Left> :above vnew<cr>
+nnoremap <leader>n<Right> :below vnew<cr>
+
+" terminal
+nnoremap <leader>t. :ter ++curwin<cr>
+nnoremap <leader>t<Up> :above ter<cr>
+nnoremap <leader>t<Down> :below ter<cr>
+nnoremap <leader>t<Left> :vertical ter<cr>
+nnoremap <leader>t<Right> :vertical botright ter<cr>
+
+" scrolling
+nnoremap <silent> <S-Up>     1<C-y>k
+nnoremap <silent> <S-Down>   1<C-e>j
+nnoremap <silent> <C-Up>     6<C-y>k
+nnoremap <silent> <C-Down>   6<C-e>l
+
+" these functions aren't ready yet
+"function! GetQuotePos()
+    "echo searchpair('"', '"', '"', 'b')
+    "return 
+"endfun
+"function! GetQuotePos_b()
+    "let l:line = getline('.')
+    "let l:len = strlen(l:line)
+    "let l:pos=getpos('.')
+"
+    "if l:pos[2] < 2
+        "echo ""
+        "return
+    "endif
+"" this is ' a line " within " a line ' and done"
+    "let l:i = l:pos[2]
+    "echo "[" . l:i . ","  . l:pos[2] . "]"
+"
+    "while l:i > 1
+        "let l:i -= 1
+        "if l:line[l:i:l:i] == '"'
+        "|| l:line[l:i:l:i] == "'"
+        "|| l:line[l:i:l:i] == "'"
+        "|| l:line[l:i:l:i] == "'"
+            "echo l:pos[2] - l:i - 1
+            "return
+        "endif
+    "endwhile
+"
+    "echo "[none]"
+"endfun
+
+""""""""""""""""" Status Line
+
+"set statusline=%.50F%m%r\ %y\%w\ buffer\ %n\ %l\|%c\ [%p%%]
+set statusline=[%{w:win_tag}]
+"set statusline+=[c:%\{GetCurChar()}]
+set statusline+=\ %.50F%m%r
+set statusline+=\ \(%l\,%c,%p%%) 
+
+" always show status line
+set laststatus=2
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+"nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>rn :call CocAction('rename')<cr>
+
+""""""""""""""""" Coc Python
+" Use K to show documentation in preview window.
+"nnoremap <silent> K :call ShowDocumentation()<CR>
+
+""""""""""""""""" Command Notes
+
+"alt-shift-d = clear line
+"alt-b = clear line from cursur to end
+"shift-l sohw python documentation
+"`` go to last cursor position
+"'' go to last line position
+"shift-# - searches for word under cursor backwards
+"shift-* searches for word under cursor forwards
+" zz - center screen on line
+" <C-m> - move to first character of next line
+" :help ^m - look up help secion on <C-m> (^ is a literal caret)
+"
+"
+" To get current line you can use
+" let line=getline('.')
+"
+" To set current line you can use
+" call setline('.', line)
+" ####
+
+set relativenumber
+set number
+set number relativenumber
+
+set mouse=a
+set cursorline
+"set cursorcolumn
+
+" highlight search results
+set hlsearch
+
+"let $VIMHOME=expand('<sfile>:p:h:h')
+set undofile
+set undodir=$HOME/.vim/undo/
+""""""""""""""""""""" Editing
+
+" indent/unindent
+vnoremap <Tab> >gv
+vnoremap <s-Tab> <gv
+
+" delete line
+nnoremap <C-x> dd
+nnoremap <M-d> dd
+
+" move line(s) up or down
+nnoremap <C-S-Down> ddp
+nnoremap <C-S-Up> ddkkp
+inoremap <C-S-Down> <Esc>ddpi
+inoremap <C-S-Up> <Esc>dd<Up><Up>pi
+vnoremap <silent> <C-S-Up> :<Esc>`<:'<,'>m -2<cr>gv
+vnoremap <silent> <C-S-Down> :<Esc>`>:'<,'>m +1<cr>gv
+" Visual Mode Explanation:
+" <Esc> " leave visual mode
+" `< " go to start of visual area
+" :'<,'>m -1<cr> " move the whole selection
+" gv " go back into visual mode and select again
+
+" https://stackoverflow.com/questions/5305137/switching-to-vim-window-by-name
+"
+" escape the end of lines up/down
+nnoremap <Esc>l $i<Right>\<Esc>j
+nnoremap <Esc>L $i<Right>\<Esc>k
+
+" delete lines
+"nnoremap <Esc>d dd
+
+""""""""""""""""""" Moving around in document
+
+noremap gg :
+
+""""""""""""""""""" git commands
+"
+" Gonna roll with just this for now:
+
+command! -nargs=+ Git call Git_With_Output('git ' . <q-args>)
+
+
+"" git commands
+"nnoremap <silent> <C-a> :call On_GitAddButtonPressed()<CR>
+"nnoremap <silent> <C-S-a> :call On_GitAddModifiedButtonPressed()<CR>
+"nnoremap <silent> <C-S-c> :call On_GitCommitButtonPressed()<CR>
+"
+"function! On_GitAddButtonPressed() range
+    "let answer = confirm('Add this file to git?', "&Yes\n&No", 2)
+    "if answer != 1
+        "return -1
+    "endif
+"
+    "let l:file_name = Get_FileName()
+    "if l:file_name == ''
+        "return -1
+    "endif
+"
+    "call Run_With_Output("git add " . l:file_name)
+"endfunction
+"
+"function! On_GitAddModifiedButtonPressed() range
+    "" Get modified files
+    "let l:files = systemlist('git status --short')
+    "if empty(l:files)
+        "echo "No modified files."
+        "return -1
+    "endif
+"
+    "echojoin(l:files, "\n")   " Print the list to the user
+"
+    "let answer = confirm('Stage ALL modified/deleted files?', "&Yes\n&No", 2)
+    "if answer != 1
+        "return -1
+    "endif
+"
+    "call Run_With_Output("git add -u")
+"endfunction
+"
+"function! On_GitCommitButtonPressed() range
+    "let msg = input('Commit message: ')
+    "if empty(msg)
+        "echo "Commit cancelled."
+        "return -1
+    "endif
+"
+    "call Run_With_Output("git commit -m " . shellescape(msg))
+"endfunction
+
+""""""""""""""""""" Plugin Combos
+
+" #### opening files
+
+" nnoremap <C-o> :tabe <cfile><cr> " open file directly under key cursor
+
+" open file directly under key cursor, in a window above
+"nnoremap <leader>f<Up> <C-w>s:e <cfile><cr> " open file directly under key cursor, in a window above
+"nnoremap <leader>f<Down> <C-w>s<C-w><Down>:e <cfile><cr> " open file directly under key cursor, in a window above
+"nnoremap <leader>f<Right> <C-w>s<C-w><Right>:e <cfile><cr> " open file directly under key cursor, in a window above
+"nnoremap <leader>f<Left> <C-w>s<C-w><Left>:e <cfile><cr> " open file directly under key cursor, in a window above
+"nnoremap <leader>f<Up> :above e<cfile><cr>
+"nnoremap <leader>f<Down> :below e<cfile><cr>
+"nnoremap <leader>f<Left> :vertical e<cfile><cr>
+"nnoremap <leader>f<Right> :vertical botright e<cfile><cr>
+"nnoremap <C-e>. :exec 'e ' . expand('<cfile>')<cr>
+"nnoremap <C-e><Up> <C-w>s:exec 'e' . expand('<cfile')><cr>
+"nnoremap <C-e><Down> <C-w>s<C-w>j:exec 'e' . expand('<cfile')><cr>
+"nnoremap <C-e><Left> <C-w>v<C-w>h:exec 'e' . expand('<cfile')><cr>
+"nnoremap <C-e><Right> <C-w>v<C-w>l:exec 'e' . expand('<cfile')><cr>
+"nnoremap <C-e><Up> :above e<cfile><cr>
+"nnoremap <C-e><Down> :below e<cfile><cr>
+"nnoremap <C-e><Left> :vertical e<cfile><cr>
+"nnoremap <C-e><Right> :vertical botright e<cfile><cr>
+"nnoremap <C-e>. :e <cfile><cr>
+"nnoremap <C-e><Up> :e <C-w><cfile><cr>
+"nnoremap <C-e><Down> :e <C-w><cfile><cr>
+"nnoremap <C-e><Left> <C-w>v<C-w>l:e <C-w><cfile><cr>
+"nnoremap <C-e><Right> <C-w>v<C-w>l:e <C-w><cfile><cr>
+
+" reged: https://vimhelp.org/eval.txt.html?#expr-%3D%7E
+" open file:line_num under cursor
+"function! OpenFileAndGoToLine()
+    "let line=getline('.')
+    "let re='", line \(0-9]+\)'
+    "if line =~# 'line'
+       " 
+    ""let re='.*[:][0-9]+
+"endfun
+
+"" insert date at selection.. or somwthing.. it's in :help v
+"vnoremap <leader>a <Esc>`>a<CR><Esc>`<i<CR><Esc>!!date<CR>kJJ
+" open file under cursor
+"nnoremap <C-o> <C-w>v<C-w>l:e <cfile><cr>
+
+" NOTE: see :help :b about +CMD that can change to line in file with +[num]
+
+function! OpenSelectedFile(move, dir) range
+    let l:file = expand('<cfile>')
+    call OpenFile(a:move, a:dir, l:file)
+endfunction
+
+function! OpenFile(move, dir, file) range
+    call Save_Pane_Sizes()
+    execute "normal \<C-w>" . a:move
+    execute ":" . a:dir . " new"
+    execute 'e ' . expand(a:file)
+    "execute ':silent set wfh'
+    call Restore_Pane_Sizes()
+endfunction 
+
+"nnoremap <C-S-o>. :e <cfile><cr>
+" WORKS FINE - prevering the line above instead
+"nnoremap <C-o>. :e <cfile><cr>
+"nnoremap <C-o><Up> <C-w>s:e <cfile><cr>
+"nnoremap <C-o><Down> <C-w>s<C-w>j:e <cfile><cr>
+"nnoremap <C-o><Left> <C-w>v<C-w>h:e <cfile><cr>
+"nnoremap <C-o><Right> <C-w>v<C-w>l:e <cfile><cr>
+
+" DOES NOT WORK
+"nnoremap <2-LeftMouse> <C-w>s:e <cfile><cr>
+
+""""""""""""""" Sessions
+
+" Save /Load session (also load with vim -S ses.vim)
+nnoremap <C-s> :mksession! ses.vim<cr>
+" note: disables syntax highlighting this way...
+nnoremap <leader>ss :source ses.vim<cr>
+
+"""""""""""""""""" Python
+
+" execute
+"nnoremap <F5> :below ter<cr>./.vim-run.sh<cr>
+""nnoremap <F5> :exec 'pedit ' !read ./.vim-run.sh<cr>
+"nnoremap <F5> :term ./.vim-run.sh <cword>
+"nnoremap <F5> :read !./.vim-run.sh
+"nnoremap <F5> :read !./.vim-run.sh <cword>
+""nnoremap <F5> :exec 'pedit ' :read !./.vim-run.sh<cr>
+"nnoremap <F5> :term ++noclose 
+" preview file under cursor
+""nnoremap <C-p> :exec 'pedit ' . expand('<cfile>')<cr>
+"nnoremap <F5> :term ./.vim-run.sh <cword>
+"nnoremap <F5> :term ++silent ./.vim-run.sh
+"nnoremap <F5> :read !./.vim-run.sh
+
+"save code, run python, show output in preview window
+function! Python_eval_vsplit() range
+  let l:srd = tempname()
+  let l:dst = tempname()
+  execute ": " . a:firstline . "," . a:lastline . "w " . l:srd
+  execute ":silent ! python " . l:srd . " > " . l:dst . " 2>&1 "
+  execute ":pclose!"
+  execute ":redraw!"
+  execute ":vsplit"
+  execute "normal \<C-W>l"
+  execute ":e! " . l:dst
+  execute ":set pvw"
+  execute "normal \<C-W>h"
+endfunction
+
+"vmap <silent> <F7> :call Python_eval_vsplit()<CR>
+"nmap <silent> <F7> mzggVG<F7>`z
+"imap <silent> <F7> <Esc><F7>a
+"map <silent> <S-F7> <C-W>l:bw<CR>
+"imap <silent> <S-F7> <Esc><S-F7>a
+
+"vim -c ":term cat $1"
+
+"""""""""""""""""" ToDo Pane
+
+function! OpenToDoWindow( file ) range
+    let l:prev_todo = FindWindow(g:win_todo_name)
+    execute ":vertical botright split"
+    execute "e " . g:todo_file
+    execute "normal 0"
+    if win_getid() != l:prev_todo
+        call SetToDoWindow()
+    endif
+endfunction
+
+function! SetToDoWindow() range
+  call Set_Win_Name(g:win_todo_name)
+  call SetHardWindowWidth( g:prev_todo_width )
+  "execute ":silent set nowrap"
+  execute ":silent set nonumber"
+endfun
+
+function! RefreshToDoWindow() range
+    let l:id = FindWindow(g:win_todo_name)
+    if l:id < 0
+        call OpenToDoWindow()
+        return
+    endif
+
+    " change the width so we don't have line breaks
+    let l:cur_width = GetPaneSize(g:win_todo_name, l:id)
+
+    let l:prev_win_id=win_getid()
+    call win_gotoid(l:id)
+
+    execute "e " . g:todo_file
+    execute "normal 0"
+
+    " to have no effect on window size
+    execute ":vert resize " . l:cur_width
+    
+    return win_gotoid(l:prev_win_id)
+endfun
+   
+function! MaximizeToDoWindow() range
+    let l:id = FindWindow(g:win_todo_name)
+    if l:id < 0
+        call OpenToDowindow()
+    else
+        call Goto_Window_ByID( l:id )
+    endif
+
+    execute ":vert resize +1000"
+endfun
+   
+
+"""""""""""""""""" Listing Files
+
+function! StopBuild() range
+    silent execute ":silent ter ++hidden ./.vim-stopBuild.sh"
+endfun
+
+function! Explore( ter_cmd ) range
+    let l:prev_explorer = FindWindow(g:win_explorer_name)
+    "execute ":setlocal nowrap"
+    "execute ":silent " . a:ter_cmd . " ++cols=100 ./.vim-list.sh"
+    "execute ":silent " . a:ter_cmd . " ++noclose ./.vim-list.sh | setlocal nowrap"
+    "execute ":silent " . a:ter_cmd . " ++noclose ./.vim-list.sh | setlocal termwinsize=0*140"
+    execute ":silent " . a:ter_cmd . " ++noclose ./.vim-list.sh"
+    execute ":setlocal termwinsize=0*140"
+    "execute ":setlocal nowrap"
+    " The setlocal thing can be automated:
+    " You can set it post terminal open through an autocommand in vimrc:
+    "
+    "au TerminalOpen * if &buftype == 'terminal' | \
+    "    setlocal termwinsize=0*140 | endif
+    " source: https://www.reddit.com/r/vim/comments/gszrkd/disable_line_wrapping_for_ter_output/
+    
+    " don't mess with window or resize it if we are just refreshing
+    execute "normal 0"
+    if win_getid() != l:prev_explorer
+        call SetExplorerWindow()
+    endif
+endfunction
+
+function! SetExplorerWindow() range
+  call Set_Win_Name(g:win_explorer_name)
+  " put unique window identifier into w:id variable
+"autocmd VimEnter,WinEnter * if !exists('w:id') | let w:id={expr_that_will_return_an_unique_identifier} | endif
+  call SetHardWindowWidth( g:prev_explorer_width )
+  execute ":silent set nowrap"
+  execute ":silent set nonumber"
+endfun
+
+function! SaveWindowSizes() range
+    let l:explorer_id=GetWinID_ByName(g:win_explorer_name)
+    let l:output_id=GetWinID_ByName(g:win_output_name)
+    "let l:prev_win_id=win_getid()
+    if l:explorer_id >= 0
+        let g:prev_explorer_width=winwidth( l:explorer_id )
+        "win_gotoid( l:explorer_id )_
+        "call On_ExplorerOpened(l:explorer_id)
+    endif
+    if l:output_id >= 0
+        let g:prev_output_height=winheight( l:output_id )
+    endif
+    "win_gotoid( l:prev_win_id )_
+  "execute ":vert resize " . g:prev_explorer_width
+endfun
+
+function! RefreshExplorerWindow() range
+    let l:id = FindWindow(g:win_explorer_name)
+    if l:id < 0
+        call OpenExplorerPane()
+        return
+    endif
+
+    " change the width so we don't have line breaks
+    let l:cur_width = GetPaneSize(g:win_explorer_name, l:id)
+
+    let l:prev_win_id=win_getid()
+    call win_gotoid(l:id)
+
+    "execute ":vert resize +1000"
+    "execute ":set tw=0"
+    
+    "execute ":silent ter ++curwin ./.vim-list.sh"
+    "execute ":silent ter ++curwin tree --gitignore"
+    call Explore("ter ++curwin")
+
+    "let l:id = FindWindow(g:win_explorer_name)
+    "call win_gotoid(l:id)
+
+    " to have no effect on window size
+    execute ":vert resize " . l:cur_width
+    "execute ":vert " . l:id . " resize " . l:cur_width
+    "execute "normal \<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<\<C-w>\<"
+    "execute ":vert " . l:id . "res 18" 
+    "execute ":redraw!"
+    
+    return win_gotoid(l:prev_win_id)
+endfun
+   
+function! OpenExplorerWindow() range
+    call Explore("vertical topleft ter")
+endfun
+   
+function! Goto_Window_ByID(id)
+    return win_gotoid(a:id)
+endfun
+
+function! Goto_Window_ByName_NoErr(name)
+    return Goto_Window_ByName_helper(a:name, 0)
+endfun
+
+function! Goto_Window_ByName(name)
+    return Goto_Window_ByName_helper(a:name, 1)
+endfun
+
+function! Goto_Window_ByName_helper(name, throw_err)
+    "let l:id=GetWinID_ByName(a:name)
+    let l:id=FindWindow(a:name)
+    if l:id >= 0
+        return Goto_Window_ByID(l:id)
+    endif
+    if a:throw_err == 1
+        echoerr 'Could not get window id for ' . a:name
+    endif
+    return 0
+endfunction
+
+function FindWindow(name)
+    for tabnr in range(1, tabpagenr('$'))
+        for winnr in range(1, tabpagewinnr(tabnr, '$'))
+            if gettabwinvar(tabnr, winnr, 'win_tag') is a:name
+                return win_getid(winnr, tabnr)
+            endif
+        endfor
+    endfor
+    return -1
+endfunction
+
+function! GetWinID_ByName(name)
+    let l:bufid = bufnr(a:name)
+    let l:winids = win_findbuf(l:bufid)
+    if len( l:winids ) > 0
+        return l:winids[0]
+    endif
+    return -1
+endfunction
+
+""""""""""""""""""""" Events
+
+function! On_WinNew() range
+endfun
+
+function! On_BufLeave() range
+endfun
+
+function! On_BufDelete() range
+    " this doesn't work how I'd expect, turning it off
+    "call SaveWindowSizes()
+endfunction
+
+function! On_TerminalWinOpen() range
+    " this doesn't work how I'd expect, turning it off
+    "call SaveWindowSizes()
+endfunction
+
+function! On_WinClosed() range
+
+endfunction
+
+""""""""""""""""""""" Output Window
+
+" Disabled:
+":let g:colorizer_auto_filetype='log'
+
+"map <silent> <S-F5> <C-W>l:bw<CR>
+"imap <silent> <S-F5> <Esc><S-F5>a
+
+function! On_RunButtonPressed() range
+    execute ":silent wall"
+    call Run_With_Output( "bash -c ./.vim-run.sh 2>&1" )
+endfunction
+
+function! On_DebugButtonPressed() range
+    execute ":silent wall"
+    call Run_With_Output( "bash -c ./.vim-debug.sh 2>&1" )
+endfunction
+
+function! Git_With_Output( args ) range
+    " Replace every % with the current file's absolute path
+    let l:filename = '"' . expand('%:p') . '"'
+    let l:realargs = substitute(a:args, '%', l:filename, 'g')
+    call Run_With_Output(l:realargs)
+endfunction
+
+function! Run_With_Output( args ) range
+    let l:prev_win_id=win_getid()
+    call ShowOutputPane()
+    if !Goto_Window_ByName(g:win_output_name)
+        echoerr 'could not switch to output window'
+    else
+        execute ":silent ter ++curwin " . a:args
+        call win_gotoid(l:prev_win_id)
+    endif
+endfun
+
+function! Toggle_Output_Window() range
+    let l:prev_win_id=win_getid()
+    call Open_Output_Window()
+    return win_gotoid(l:prev_win_id)
+endfun
+
+function! IsOutputPaneHidden(pane_id) range
+    let l:eSize = winheight(a:pane_id)
+    if l:eSize < 2
+        return 1
+    endif
+    return 0
+endfun
+
+function! ShowOutputPane() range
+    let l:id = FindWindow(g:win_output_name)
+    if l:id < 0
+        call Open_Output_Window()
+    else
+        if IsOutputPaneHidden(l:id)
+            let l:prev_win_id=win_getid()
+            "let l:eSize = GetMinPaneSize(g:prev_output_height)
+            call Goto_Window_ByID(l:id)
+            call SetPaneSize(g:win_output_name, g:prev_output_height)
+            call win_gotoid(l:prev_win_id)
+        endif
+    endif
+endfun
+
+function! Open_Output_Window() range
+    if IsWindowOpen(g:win_output_name) == 1
+        call SetPaneSize(g:win_output_name, )
+        return
+    endif
+
+    call New_Output_Window()
+    call Load_Output_Log()
+endfun
+
+function! New_Output_Window() range
+    execute "normal \<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j\<C-w>j"
+    execute ":silent below new"
+    call SetOutputWindow()
+endfun
+
+function! SetHardWindowHeight( height ) range
+    if a:height <= 0
+        return
+    endif
+
+    execute ":silent resize " . a:height
+    "execute ":silent set wmh"
+    ""execute ":silent set wfh"
+    execute ":silent set wh"
+    "execute ":silent set winminheight"
+    execute ":silent set winfixheight"
+endfun
+
+function! SetHardWindowWidth( width ) range
+    if a:width <= 0
+        return
+    endif
+
+    execute ":silent vert resize " . a:width
+    ""execute ":silent call winwidth('wfw')"
+    ""execute ":silent call winwidth('wiw')"
+    ""execute ":silent call winminwidth('wiw')"
+    "execute ":silent silent set wmw"
+    ""execute ":silent silent set wfw"
+    ""execute ":silent silent set wiw"
+    "execute ":silent set wi"
+    "execute ":silent set wmw"
+    "execute ":silent set wiw"
+    "execute ":silent set winminwidth"
+    execute ":silent set winfixwidth"
+endfun
+
+function! SetOutputWindow() range
+  call Set_Win_Name(g:win_output_name)
+  call SetHardWindowHeight( g:prev_output_height )
+  execute ":silent set nowrap"
+  execute ":silent redraw!"
+endfunction
+
+function! Load_Output_Log() range
+  let l:dst = "./out.log"
+  execute ":silent e " . l:dst
+  "execute ":silent ColorHighlight"
+endfunction
+
+"function! Run_With_Output( args ) range
+  "let l:dst = "./out.log"
+  "let l:prev_win_id=win_getid()
+  ""let l:prev_win_id=winbufnr(winnr())
+  "let l:window_ready = 0
+  "if IsWindowOpen(g:win_output_name) == 1
+    "if Goto_Window_ByName(g:win_output_name) < 0
+      "let l:window_ready = 1
+    "endif 
+  "endif
+"
+  "if l:window_ready == 1
+    "execute ":silent ter ++curwin " . a:args
+  "else
+    "execute ":silent below ter " . a:args
+    "execute "normal <Silent> \<C-W>\<Down>"
+  "endif
+"
+  "call SetOutputWindow()
+  "call win_gotoid(l:prev_win_id)
+"endfunction
+"
+   
+function! Get_FileName()
+    " todo: tag windows as 'edit windows' or maybe 'project file windows'
+    "
+    let l:cur_win_id=win_getid()
+    if l:cur_win_id == -1
+        return ''
+    endif
+
+    let l:output_id=FindWindow(g:win_output_name)
+    if l:cur_win_id == l:output_id
+        return ''
+    endif
+
+    let l:explorer_id=FindWindow(g:win_explorer_name)
+    if l:cur_win_id == l:explorer_id
+        return ''
+    endif
+
+    let l:todo_id=FindWindow(g:win_todo_name)
+    if l:cur_win_id == l:todo_id
+        return ''
+    endif
+
+    return expand('%:t')
+endfunction
+
+function! Goto_Helper( search_opts, move ) range
+    let l:output_id=FindWindow(g:win_output_name)
+    if l:output_id == -1
+        return -1
+    endif
+
+    let l:file_name = Get_FileName()
+    if l:file_name == ''
+        return -1
+    endif
+
+    let l:cur_win_id=win_getid()
+    if l:cur_win_id == -1
+        return -1
+    endif
+
+    if Goto_Window_ByID( l:output_id ) == -1
+        return -1
+    endif
+    let l:pos=getpos('.')
+    execute a:move
+    if Goto_Window_ByID( l:cur_win_id ) == -1
+        return -1
+    endif
+
+    let l:ret = Goto_OccurenceInFile( a:search_opts, l:file_name ) 
+    if Goto_Window_ByID( l:output_id ) == -1
+        return -1
+    endif
+    if l:ret < 0
+        call cursor( l:pos )
+    else
+        execute 'normal 0'
+    endif
+
+    call Goto_Window_ByID( l:cur_win_id ) 
+    return l:ret
+endfunction
+
+function! Goto_PrevLogOccurenceInFile( search_opts ) range
+    return Goto_Helper( a:search_opts, 'normal 0' )
+endfunction
+
+function! Goto_NextLogOccurenceInFile( search_opts ) range
+    return Goto_Helper( a:search_opts, 'normal $' )
+endfunction
+
+function! Goto_FirstLogOccurenceInFile( text, highlight_group ) range
+    " set up so the next/prev will search for the same text
+    let g:prev_log_search=a:text
+    let g:prev_log_search_highlightGroup=a:highlight_group
+
+    let l:cur_win_id=win_getid()
+    let l:output_id=FindWindow(g:win_output_name)
+    if l:output_id == -1
+        return -1
+    endif
+
+    " just see if we can find one at all, first
+    if Goto_Window_ByID( l:output_id ) == -1
+        return -1
+    endif
+    if Goto_OccurenceInFile('', '') < 0
+        call Goto_Window_ByID( l:cur_win_id )
+        return -1
+    endif 
+
+    " now we can go to end of the output file before finding the first error
+    " (wrapping to top)
+
+    if Goto_Window_ByID( l:cur_win_id ) == -1
+        return -1
+    endif
+
+    let l:ret = Goto_Helper('', "normal \<C-End>$")
+    return l:ret
+endfunction
+
+function! Goto_OccurenceInFile( search_opts, file_name_sent ) range
+    let l:file_name = a:file_name_sent
+    let l:cur_win_id=win_getid()
+    let l:output_id=FindWindow(g:win_output_name)
+
+    if l:output_id == -1
+        return -1
+    endif
+
+    let l:found = 0
+    " first, see if we can find an error with the current buffer's filename
+    if l:output_id != l:cur_win_id
+        "execute 'normal i' . l:file_name . g:prev_log_search . a:search_opts
+        call Goto_Window_ByID( l:output_id )
+        if search( l:file_name . g:prev_log_search, a:search_opts )
+            let l:found = 1
+        endif
+    endif
+
+    " second, see if we can find any error at all
+    if l:found != 1
+        let l:file_name = ''
+        if search( g:prev_log_search, a:search_opts )
+        else
+            call Goto_Window_ByID( l:cur_win_id )
+            return -1
+        endif
+    endif
+
+    let l:re_line1='\v(.*' . l:file_name . '):'
+    let l:re_char1='\v(.*' . l:file_name . '):(\d+):'
+
+    :execute "normal z."
+    :execute 'match ' . g:prev_log_search_highlightGroup . ' /\%' . line('.') . 'l\%>0c./'
+
+    if l:output_id != l:cur_win_id
+        let l:log_line=getline('.')
+        let l:re_line2='\v(:.*)'
+        let l:line = substitute( l:log_line, re_line1, '' , 'g' )
+        let l:line = substitute( l:line, re_line2, '' , 'g' )
+
+        let l:re_char2=':\v(.*)'
+        let l:char = substitute( l:log_line, re_char1, '' , 'g' )
+        let l:char = substitute( l:char, re_char2, '' , 'g' )
+
+        call Goto_Window_ByID( l:cur_win_id )
+        if l:found == 1
+            if l:line != ""
+                :execute ':' . l:line
+
+                :execute "normal z."
+                if l:line != ""
+                    let l:line_len=len(l:log_line)
+                    let l:err_len=l:line_len-len(l:char)
+                    :execute 'normal ' . l:char . '|'
+                    :execute 'match ' . g:prev_log_search_highlightGroup . ' /\%' . l:line . 'l\%>' . l:char . 'c./'
+                else
+                endif
+            endif
+        endif
+    endif
+    return 0
+endfun
+
+"""""""""""""""" Window Management
+
+function! GrowWindow( dir, amt ) 
+    let l:cur_win_id=win_getid()
+    let l:output_id=FindWindow(g:win_output_name)
+    let l:explorer_id=FindWindow(g:win_explorer_name)
+    let l:todo_id=FindWindow(g:win_todo_name)
+
+    call Save_Pane_Sizes()
+    execute ":silent " . a:dir . " resize " . a:amt
+
+    if l:cur_win_id != l:output_id && l:cur_win_id != l:explorer_id && l:cur_win_id != l:output_id
+        " this hack to get windows to grow just does not work. I need windows
+        " to gro vertically upward instead of downard.... how tho?
+        "
+        "let l:new_size=0
+        "if a:dir == ''
+            "let l:new_size=GetCurWindowHeight()
+        "else
+            "let l:new_size=GetCurWindowdowWidth()
+        "endif
+
+        call Restore_Pane_Sizes()
+
+        "let l:chk_size=0
+        "if a:dir == ''
+            "let l:chk_size=GetCurWindowHeight()
+        "else
+            "let l:chk_size=GetCurWindowWidth()
+        "endif
+"
+        "if l:new_size != l:chk_size
+            "if a:amt < 1
+                "let l:new_size += 1
+            "else
+                "let l:new_size -= 1
+            "endif
+            "call GrowWindow( a:dir, l:new_size )
+        "endif
+    endif
+endfunction
+
+function! GetCurWindowHeight()
+    return winheight(0)
+endfun
+
+function! GetCurWindowWidth()
+    return winwidth(0)
+endfun
+
+function! GetWindowWidth( name )
+    let l:id=FindWindow(a:name)
+    if l:id >= 0
+        let ret=winwidth(l:id)
+        return l:ret
+    endif
+    return 0
+endfun
+
+function! GetWindowHeight( name )
+    let l:id=FindWindow(a:name)
+    if l:id >= 0
+        return winheight( l:id )
+    endif
+    return 0
+endfun
+
+function! Save_Pane_Sizes()
+    let g:saved_explorer_width=GetWindowWidth(g:win_explorer_name)
+    let g:saved_todo_width=GetWindowHeight(g:win_todo_name)
+    let g:saved_output_height=GetWindowHeight(g:win_output_name)
+endfun
+
+function! Restore_Pane_Sizes()
+    let l:prev_win_id=win_getid()
+
+    if g:saved_todo_width > 0
+        if Goto_Window_ByName_NoErr(g:win_todo_name)
+            call SetHardWindowWidth( g:saved_todo_width )
+        endif
+    endif
+
+    if g:saved_output_height > 0
+        if Goto_Window_ByName_NoErr(g:win_output_name)
+            call SetHardWindowHeight( g:saved_output_height )
+        endif
+    endif
+
+    if g:saved_explorer_width > 0
+        if Goto_Window_ByName_NoErr(g:win_explorer_name)
+            call SetHardWindowWidth( g:saved_explorer_width )
+        endif
+    endif
+
+    return win_gotoid(l:prev_win_id)
+endfun
+
+function! Goto_ResizedWindow( upDown, addheight )
+    call Save_Pane_Sizes()
+    execute "normal \<C-w>" . a:upDown
+    execute ":silent resize " . a:addheight
+    call Restore_Pane_Sizes()
+endfunction
+
+""""""""""""""""""""" Vim RC
+
+" this is simply unused right now.
+"" reload vimrc
+"function! ReloadVimRC()
+    "execute ":source ~/.vimrc<cr>
+"endfunction
+
+nnoremap <leader>` :source ~/.vimrc<cr>
+
+" open vimrc
+"nnoremap <silent> <leader>~ :sp ~/.vimrc<cr>
+nnoremap <silent> <leader>~ :call OpenFile('k', 'above', '~/.vimrc')<cr>
+
+""""""""""""""""""""""" Scrolling
+
+" doesn't work
+"" mouse scroll faster with CTRL
+"map <C-ScrollWheelUp>   5<C-Y>
+"map <C-ScrollWheelDown> 5<C-E>
+" Note:
+    "b – move to the start of a word
+    "B – move to the start of a token
+    "w – move to the start of the next word
+    "W – move to the start of the next token
+    "e – move to the end of a word
+    "E – move to the end of a token
+""""""""""""""""" comment and un-comment lines
+
+let all_comment_indicators={
+    \   'python': '#'
+    \   , 'bash': '#'
+    \   , 'sh': '#'
+    \   , 'r': '#'
+    \   , 'R': '#'
+    \   , 'cpp': '//'
+    \   , 'c': '/*'
+    \   , 'batch': '#'
+    \   , 'dosbatch': '@rem '
+    \    , 'vim': '"'
+    \    , 'fstab': '#'
+    \    , 'sshdconfig': '#'
+    \    , 'conf': '#'
+    \   , 'gitconfig': '#'
+    \ }
+
+function! CommentLine(cmd)
+  let ft=&ft
+  let ci=g:all_comment_indicators[ft]
+  execute ":normal ^i" . ci
+  execute a:cmd
+endfunction
+
+function! UnCommentLine(cmd)
+  let ft=&ft
+  let ci_len=len(g:all_comment_indicators[ft])
+  for i in range(1, ci_len )
+    execute ":normal ^x"
+    endfor
+  execute a:cmd
+endfunction
+
+nnoremap <Esc>c :call CommentLine("+1")<cr>
+nnoremap <Esc>C :call UnCommentLine("+1")<cr>
+" nnoremap <Esc>C ^xj
+" todo: line above currently just removes the first char regardless of what it is
+
+"function! UnCommentLine(cmd)
+  "let ft=&ft
+  "let ci=g:all_comment_indicators[ft]
+  "silent execute ':s/^\s' . ci . '/\1'
+  "execute "+1"
+"endfunction
+" nnoremap <Silent><Esc>C :call UnCommentLine("+1")<cr>
+" nnoremap <Esc>c :execute 's/^\s' . expand('g_all_comment_indicators[&ft]') . '/\1/'
+"also could do this: nnoremap # 0i#<Esc>+10
+"nnoremap # 0i#<Esc>+10
+"nnoremap <C-3> <Home>i#<Up><Home><Down>
+
+" ####
+
+" todo: ctrl-right in insert mode to not go to next line...
+
+" In insert mode, Ctrl-o escapes user to do one normal-mode command, and then return to the insert mode. The same effect can be achieved by <ESC>ing to normal mode, doing the single command and then entering back to insert mode. Ctrl-i is simply a <Tab> in insert mode.
+
+" In normal mode, Ctrl-o and Ctrl-i jump user through their "jump list", a list of places where your cursor has been to. The jumplist can be used with the quickfix feature, for example to quickly enter to a line of code containing errors.
+
+" open a terminal window vertically
+" nnoremap <C-S-t> :ter<cr> " this is already a thing
+
+""""""""""""""" Window Stuff - Generic
+
+autocmd WinClosed * call On_WinClosed()
+autocmd WinNew * call On_WinNew()
+autocmd BufLeave * call On_BufLeave()
+autocmd TerminalWinOpen * call On_TerminalWinOpen()
+autocmd BufDelete * call On_BufDelete()
+
+function! OpenWindow(win_tag) range
+    if a:win_tag == g:win_output_name
+        call Open_Output_Window()
+    elseif a:win_tag == g:win_explorer_name
+        call OpenExplorerWindow()
+    elseif a:win_tag == g:win_todo_name
+        call OpenToDoWindow(g:todo_file)
+    endif
+endfun
+
+function! SetPaneSize(win_name, size) range
+    if a:win_name == g:win_output_name
+        call SetHardWindowHeight( a:size )
+    elseif a:win_name == g:win_explorer_name
+        call SetHardWindowWidth( a:size )
+    elseif a:win_name == g:win_todo_name
+        call SetHardWindowWidth( a:size )
+    else
+        echoerr 'Pane not implemented: ' . a:win_name
+        return 0
+    endif
+endfun
+
+function! GetPaneSize(win_name, pane_id) range
+    if a:win_name == g:win_output_name
+        return winheight(a:pane_id)
+    elseif a:win_name == g:win_explorer_name
+        return winwidth(a:pane_id)
+    elseif a:win_name == g:win_todo_name
+        return winwidth(a:pane_id)
+    else
+        echoerr 'Pane not implemented: ' . a:win_name
+        return 0
+    endif
+endfun
+
+function! GetMinPaneSize(win_name) range
+    if a:win_name == g:win_output_name
+        return g:min_output_height
+    elseif a:win_name == g:win_explorer_name
+        return g:min_explorer_width
+    elseif a:win_name == g:win_todo_name
+        return g:min_todo_width
+    else
+        echoerr 'Pane not implemented: ' . a:win_name
+        return 0
+    endif
+endfun
+
+function! TogglePane(win_tag) range
+        let l:pane_id=FindWindow(a:win_tag)
+        if l:pane_id < 0
+            if a:win_tag == g:win_output_name
+                call Toggle_Output_Window()
+            elseif a:win_tag == g:win_explorer_name
+                call OpenExplorerWindow()
+            elseif a:win_tag == g:win_todo_name
+                call OpenToDoWindow(g:todo_file)
+            else 
+                call OpenWindow(a:win_tag)
+            endif        
+            return
+        endif
+
+        let l:prev_id=win_getid()
+        let l:eSize = GetPaneSize(a:win_tag, l:pane_id)
+        if l:eSize < 2
+            let l:eSize = GetMinPaneSize(a:win_tag)
+        else
+            let l:eSize = 1
+        endif
+        if Goto_Window_ByID(l:pane_id)
+            call SetPaneSize(a:win_tag, l:eSize)
+            call win_gotoid(l:prev_id)
+            if a:win_tag == g:win_explorer_name
+                call RefreshExplorerWindow()
+            endif
+            return
+        else
+            echoerr 'Could not switch to window to set its width'
+            return
+        endif
+        echoerr 'Could not set window width'
+        return
+
+    "if CloseWindow(a:win_tag) == 1
+        "return
+    "endif
+
+    if a:win_tag == g:win_output_name
+        call Toggle_Output_Window()
+    else
+endfun
+    
+function CloseWindow( win_tag ) range
+    " execute ":pclose!"
+    for nr in range(1, winnr('$'))
+        if getwinvar(nr, "win_tag") == a:win_tag
+            execute nr."wincmd q"
+            return 1
+        endif
+    endfor
+    return 0
+endfun
+
+function! IsWindowOpen(win_tag) range
+    for nr in range(1, winnr('$'))
+        "Note: if getwinvar(nr, "&win_tag") == 1 # tests if the window HAS the
+        "variable
+        if getwinvar(nr, "win_tag") == a:win_tag
+            return 1
+        endif  
+    endfor
+    return 0
+endfun
+
+function! Set_Win_Name(name) range
+  "execute ":silent call setwinvar(0, '&" . a:name . "', v:true)"
+  execute ":silent file " . a:name 
+  execute ":silent let w:win_tag='" . a:name . "'"
+endfun
+
+"""""""""""""""" OLDER STUFF
+
+" register c: put # at line start and move to next line
+let @c = 'IOH#j'
+" register d: put # at line start and move to next line
+let @d = 'IOH#k'
+
+""""""""""""""""""" binding macros
+
+" press <Leader-+> and then a letter key, and now <+> will exec that register
+" eg: <Leader-+> <c> <enter> will make <+> execute register c
+let @x = ':map + @'
+nnoremap <Leader>+ @x
+
+let @y = ':map - @'
+nnoremap <Leader>- @y
+
+"""""""""""""""""""" repeat macros
+nnoremap , = @@
+
+"""""""""" extended regex
+"nnoremap / /\v
+"vnoremap / /\v
+
+"""""" markdown code highlighting
+let g:markdown_fenced_languages = ['cpp', 'sql', 'bash']
+
+""""""" vim-plug plugins
+"" Auto-install
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+" Plugins will be downloaded under the specified directory.
+call plug#begin(has('nvim') ? stdpath('data') . '/plugged' : '~/.vim/plugged')
+
+" Declare the list of plugins.
+"Plug 'tpope/vim-sensible'
+"Plug 'junegunn/seoul256.vim'
+" for code completetion
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"Plug 'beancount/vim-beancount'
+Plug 'nathangrigg/vim-beancount'
+Plug 'SirVer/ultisnips'
+
+
+" List ends here. Plugins become visible to Vim after this call.
+call plug#end()
+
+"Plug 'luochen1990/rainbow'
+"let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
+
+" this .... seems to fix some syntax hilighting issues, but... it's weird.
+" research it.
+"set termguicolors
+
+""""""""" FORCE REMAPS / things that conflicted with Snippets
+"" Use <Tab> and <S-Tab> to navigate completion menu
+"imap <silent><expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+"imap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+"
+"" Use <CR> to confirm completion
+"imap <silent><expr> <CR> pumvisible() ? coc#_select_confirm() : "\<CR>"
+
