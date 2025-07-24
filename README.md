@@ -116,7 +116,3 @@ A: All configs are in the `configs/` directory.
 
 GPL 3
 
----
-
-**Go wild, break nothing, and get back to editing.**
-
