@@ -1,8 +1,10 @@
-# VIDE: Vim IDE Bootstrapper
+# VIDE: Vim IDE
 
 VIDE ("Vim IDE") is intended to turn Vim into a decent programming IDE via the use of plugins and configs, via a reproducible Vim configuration system—designed to be cloned, bootstrapped, and sandboxed anywhere, without risk to your real Vim environment.
 
 NOTE: This software has NOT been tested; it has primarily been created as a means to recreate a Vim installation for my own personal workflow.
+
+run vim-bootstrap.sh [homedir] to install.
 
 ## Features
 
