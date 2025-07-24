@@ -114,7 +114,7 @@ A: All configs are in the `configs/` directory.
 
 ## License
 
-MIT (or your preferred license here)
+GPL 3
 
 ---
 
