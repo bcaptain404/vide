@@ -74,9 +74,9 @@ VIDE/
 - **Creates all needed directories in your chosen sandbox location.**
 - **Copies configs from **``** into the sandbox.**
 - **Installs **[**vim-plug**](https://github.com/junegunn/vim-plug)** if missing.**
-- **Runs **``** and bulk installs all plugins.**
-- **Runs **``** to fetch all specified CoC extensions.**
-- **Never touches your real home directory or dotfiles.**
+- **Bulk installs required plugins.**
+- **Fetches required CoC extensions.**
+- **Never touches your real home directory or dotfiles (unless directed to do so).**
 
 ---
 
