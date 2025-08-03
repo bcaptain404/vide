@@ -8,6 +8,8 @@ NOTE: This software has NOT been tested; it has primarily been created as a mean
 
 run vim-bootstrap.sh [homedir] to install.
 
+NOTE: AI is being used only to generate much of the readme.
+
 ## Features
 
 - **Sandboxed:** Never trashes your real `~/.vim` or `~/.vimrc`—everything goes into a user-specified directory.
